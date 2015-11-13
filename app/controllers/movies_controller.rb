@@ -11,7 +11,16 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.order(params[:order]).all
+    @all_ratings = Movie.order(:rating).pluck(:rating).uniq
+    @ratings = []
+    unless params[:ratings].nil?
+      params[:ratings].each do |key, value|
+        @ratings << key
+      end
+    else
+      @ratings = @all_ratings
+    end
+    @movies = Movie.order(params[:order]).where(["rating in (?)",@ratings]) 
   end
 
   def new
